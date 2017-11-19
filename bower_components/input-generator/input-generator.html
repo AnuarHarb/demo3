@@ -1,0 +1,142 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="input-generator">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    {{ value }}
+    <template is="dom-if" if="{{ _typeElement(configuration.type,'paper-input')}}">
+      <paper-input id="actual" label="{{ configuration.label }}" name="{{ configuration.name }}" type="{{ configuration.type }}" auto-validate pattern="{{ configuration.pattern }}" error-message="{{ configuration.error }}"></paper-input>
+    </template>
+    <template is="dom-if" if="{{ _typeElement(configuration.type, 'paper-textarea')}}">
+      <paper-textarea id="actual" label="{{ configuration.label }}" name="{{ configuration.name }}" pattern="{{ configuration.pattern }}"></paper-textarea>
+    </template>
+    <template is="dom-if" if="{{ _typeElement(configuration.type, 'paper-checkbox')}}">
+      <paper-checkbox id="actual" name="{{ configuration.name }}" pattern="{{ configuration.pattern }}">{{ configuration.label }}</paper-checkbox>
+    </template>
+    <template is="dom-if" if="{{ _typeElement(configuration.type, 'paper-listbox')}}">
+      <paper-listbox id="actual" label="configuration.label" name="{{ configuration.name }}">
+        <template is="dom-repeat" items="{{ configuration.options }}">
+          <paper-item>{{ item.name }}</paper-item>
+        </template>
+      </paper-listbox>
+    </template>
+    <template is="dom-if" if="{{ _typeElement(configuration.type, 'paper-dropdown-menu')}}">
+      <paper-dropdown-menu id="actual" label="{{configuration.label}}" error-message="{{ configuration.error }}" >
+        <paper-listbox slot="dropdown-content" class="dropdown-content">
+          <template is="dom-repeat" items="{{ configuration.options }}">
+            <paper-item>{{ item.name }}</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+    </template>
+  </template>
+
+  <script>
+    /**
+     * # Input Generator
+     * `<input-generator>` creates paper-input, paper-checkbox, paper-listbox and paper-dropdown-menu based in a json object.
+     * 
+     * ## Usage
+     * You just need add in anywhere you need and set object when the correct syntax
+     * <input-generator configuration='{ "label" : "label-title", "name": "nameInput", pattern" : "regex", "error" : "error-message", "type" : "text", "attributes" : [{ "disabled" : true }] }'></input-generator>
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class InputGenerator extends Polymer.Element {
+
+      static get is() { return 'input-generator'; }
+      static get properties() {
+        return {
+          /** Object to configure the input */
+          configuration: {
+            type: Object,
+            value: { label: "Default input", name : "default", type : "text", pattern : "", error_message : "" }
+          },
+          value : {
+            type : String,
+            value : ""
+          }
+        };
+      }
+      
+      /** Define if the input's type is the same for the component's template */
+      _typeElement(type, expectedType) {
+        let typeElement = "paper-input";
+        switch (type) {
+          case "textarea" :
+            typeElement = "paper-textarea";
+            break;
+          case "checkbox" :
+            typeElement = "paper-checkbox";
+            break;
+          case "listbox" :
+            typeElement = "paper-listbox";
+            break;
+          case "dropdown" :
+            typeElement = "paper-dropdown-menu";
+            break;
+        }
+        return typeElement === expectedType;
+      }
+
+      /** Set attributes from configuration.attributes object */
+      _assignAttributes() {
+        if (this.configuration && this.configuration.attributes) {
+          let attributes = this.configuration.attributes
+          let actualElement = this.shadowRoot.querySelector('#actual');
+          for (let key in attributes) {
+            actualElement[key] = attributes[key];
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        Polymer.RenderStatus.afterNextRender(this, this._assignAttributes, this.configuration.attributes);
+      }
+
+      /**
+       * Retrieve data about the input.
+       *
+       * @return {Object} with name, value and hasError.
+       */
+      getValue() {
+        let actualElement = this.shadowRoot.querySelector('#actual');
+        let configuration = this.configuration;
+        let type = configuration.type;
+        let infoComponent = {} ;
+        infoComponent.name = configuration.name;
+        switch (type) {
+          case "checkbox" :
+            infoComponent.value = actualElement.checked;
+            break;
+          case "listbox" :
+            infoComponent.value = actualElement.selectedItems;
+            break;
+          case "dropdown" :
+            infoComponent.value = actualElement.value;  
+            break;
+          default :
+            infoComponent.value = actualElement.value;
+        }
+        infoComponent.hasError = actualElement.invalid;
+        return infoComponent;
+      }
+
+    }
+
+    window.customElements.define(InputGenerator.is, InputGenerator);
+  </script>
+</dom-module>

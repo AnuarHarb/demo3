@@ -1,0 +1,121 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../input-generator/input-generator.html">
+<link rel="import" href="../shadycss/apply-shim.html">
+
+<dom-module id="form-evaluator-generator">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      button {
+        margin-top: 1rem;
+        @apply --form-evaluator-button-theme;
+      }
+
+      button:hover {
+        @apply --form-evaluator-button-hover;
+      }
+
+      input-generator {
+        --paper-input-container-label: {
+          @apply --form-input-container-label;
+        };
+        --paper-input-container-label-floating: {
+          @apply --form-input-container-label-floating;
+        };
+        --paper-input-container-input: {
+          @apply --form-input-container-input;
+        };
+        --paper-input-container-input-focus: {
+          @apply --form-input-container-input-focus;
+        };
+        --paper-input-container-input-invalid: {
+          @apply --form-input-container-input-invalid;
+        };
+        --paper-dropdown-menu: {
+          @apply --form-dropdown-menu;
+        };
+        --paper-dropdown-menu-button: {
+          @apply --form-dropdown-menu-button;
+        };
+        --paper-dropdown-menu-input: {
+          @apply --form-dropdown-menu-input;
+        };
+        --paper-dropdown-menu-icon: {
+          @apply --form-dropdown-menu-icon;
+        };
+        --paper-checkbox-label: {
+          @apply --form-checkbox-label;
+        };
+        --paper-checkbox-label-checked: {
+          @apply --form-checkbox-label-checked;
+        };
+        --paper-listbox: {
+          @apply --form-listbox;
+        }
+      }
+
+      .--container-slot {
+        margin-top: 1rem; 
+        margin-bottom: 1rem;
+      }
+
+    </style>
+    <div>
+        <template is="dom-repeat" items="[[fields]]">
+          <input-generator configuration="{{item}}"></input-generator>
+        </template>
+        <div class="--container-slot">
+          <slot name="custom-section"></slot>
+        </div>
+        <button on-click="handleClick">{{ actionTitle }}</button>
+    </div>
+  </template>
+
+  <script>
+    /**
+     * `form-evaluator-generator` creates a form using an array of object with the field's configuration.
+     * 
+     * ## Usage
+     * You just need add in anywhere you need and set the array of object with the correct syntax, this component uses input-generator
+     * <form-evaluator-generator fields='[{ "label" : "Name", "name": "name", "pattern" : "[a-zA-Z]*", "error" : "El nombre tiene caracteres desconocidos", "attributes" : [ { "disabled" : false }] }]'>
+       </form-evaluator-generator>
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class FormEvaluatorGenerator extends Polymer.Element {
+      static get is() { return 'form-evaluator-generator'; }
+      static get properties() {
+        return {
+          /** Array with Objects to create the form */
+          fields: {
+            type: Array,
+            value: []
+          },
+          /** Button's title */
+          actionTitle : {
+            type: String,
+            value: "Evalua prestamo"
+          }
+        };
+      }
+      handleClick (event) {
+        let inputs = this.shadowRoot.querySelectorAll('input-generator');
+        let data = [];
+        for (let i = 0; i < inputs.length; i++) {
+          data.push(inputs[i].getValue());
+        }
+        this.dispatchEvent(new CustomEvent('form-evaluator-submitted', { bubbles: true, composed: true,detail: data }));
+      }
+      ready () {
+        super.ready();
+      }
+    }
+
+    window.customElements.define(FormEvaluatorGenerator.is, FormEvaluatorGenerator);
+  </script>
+</dom-module>

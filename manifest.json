@@ -1,0 +1,7 @@
+{
+  "name": "demo3",
+  "short_name": "demo3",
+  "description": "Demo for the credit evaluation component",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>credit-connection demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../credit-connection.html">
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic credit-connection demo</h3>
+      <demo-snippet>
+        <template>
+          <credit-connection
+            params='{"name": "anuar", "lastName": "Harb", "creditAmount": "1000", "monthlyIncome": "10000", "timeToPay":"20"}'
+            api="https://teloprestopapu.herokuapp.com/api/calculate"
+            config='{"interest": ".38", "salaryPayLimit":".3"}'>
+          </credit-connection>
+        </template>
+      </demo-snippet>
+
+      <button onclick="changeBody()">change</button>
+    </div>
+
+    <script>
+      function changeBody() {
+        document.querySelector('credit-connection').setAttribute('body', '{"name": "Joel", "lastName": "Harb", "creditAmount": "10000"}');
+        console.log('pum');
+      }
+    </script>
+  </body>
+</html>

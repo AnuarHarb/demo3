@@ -1,0 +1,28 @@
+{
+  "name": "form-evaluator-generator",
+  "main": "form-evaluator-generator.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.0",
+    "input-generator": "https://github.com/dezkareid/input-generator.git"
+  },
+  "devDependencies": {
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "web-component-tester": "Polymer/web-component-tester#^6.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
+    "iron-component-page": "^3.0.1"
+  },
+  "resolutions": {
+    "polymer": "^2.0.0"
+  },
+  "homepage": "https://github.com/dezkareid/form-evaluator-generator",
+  "version": "1.0.4",
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.4",
+    "commit": "938122a9db263a9082f1f6eab8430c169a451c9f"
+  },
+  "_source": "https://github.com/dezkareid/form-evaluator-generator.git",
+  "_target": "*",
+  "_originalSource": "dezkareid/form-evaluator-generator"
+}

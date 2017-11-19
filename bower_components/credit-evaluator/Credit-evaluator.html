@@ -1,0 +1,226 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../credit-connection/credit-connection.html">
+<link rel="import" href="../form-evaluator-generator/form-evaluator-generator.html">
+
+<dom-module id="credit-evaluator">
+    <template>
+        <style>
+            :host {
+                display: flex;
+                flex-direction: column;
+                background-color: darkgray;
+                border: none;
+                height: var(--credit-evaluator-height, 400px);
+                width: var(--credit-evaluator-width, 100%);
+                margin-top: 30px;
+                border-radius: var(--credit-evaluator-border-radius, 10px);
+                font-family:  var(--credit-evaluator-font-family, arial);
+                @apply --credit-evaluator-mixin;
+                --form-evaluator-button-theme: {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                    margin-left: 25%;
+                    font-size: 1em;
+                    height: var(--credit-evaluator-button-height, 50px);
+                    width: var(--credit-evaluator-button-width, 50%);
+                    background-color: var(--credit-evaluator-button-bg-color, black);
+                    color: var(--credit-evaluator-button-color, white);
+                };
+            }
+
+            .header-container {
+                display: var(--credit-evaluator-header-display, flex);
+                flex-direction: var(--credit-evaluator-header-flex-direction, row);
+                align-items: var(--credit-evaluator-header-align-items, center);
+                justify-content: var(--credit-evaluator-header-justify-content, center);
+                height: var(--credit-evaluator-header-height, 10%);
+                width: var(--credit-evaluator-header-width, 100%);
+                border: var(--credit-evaluator-header-border, none);
+                border-top-left-radius: var(--credit-evaluator-border-radius, 10px);
+                border-top-right-radius: var(--credit-evaluator-border-radius, 10px);
+                background-color: var(--credit-evaluator-header-bg-color, black);
+                color: var(--credit-evaluator-header-color, lightgray);
+                font-size: var(--credit-evaluator-header-font-size, 2rem);
+                @apply --credit-evaluator-header-mixin;
+            }
+
+            .main-container {
+                display: var(--credit-evaluator-main-display, flex);
+                flex-direction: var(--credit-evaluator-main-flex-direction, column);
+                justify-content: var(--credit-evaluator-main-justify-content, center);
+                overflow-y: scroll;
+                padding-top: 50px;
+                height: var(--credit-evaluator-main-height, 80%);
+                width: var(--credit-evaluator-main-width, 100%);
+                border: var(--credit-evaluator-main-border, 1px solid white);
+                background-color: var(--credit-evaluator-main-bg-color, white);
+                color: var(--credit-evaluator-main-color, black);
+                @apply --credit-evaluator-main-mixin;
+            }
+
+            .footer-container {
+                display: var(--credit-evaluator-footer-display, flex);
+                flex-direction: var(--credit-evaluator-footer-flex-direction, row);
+                align-items: var(--credit-evaluator-footer-align-items, center);
+                justify-content: var(--credit-evaluator-footer-justify-content, center);
+                height: var(--credit-evaluator-footer-height, 10%);
+                width: var(--credit-evaluator-footer-width, 100%);
+                border: var(--credit-evaluator-header-border, none);
+                border-bottom-left-radius: var(--credit-evaluator-border-radius, 10px);
+                border-bottom-right-radius: var(--credit-evaluator-border-radius, 10px);
+                background-color: var(--credit-evaluator-footer-bg-color, lightgray);
+                color: var(--credit-evaluator-footer-color, white);
+                font-size: var(--credit-evaluator-footer-font-size, 1rem);
+                @apply --credit-evaluator-footer-mixin;
+            }
+        </style>
+        
+        <div class="header-container">
+            <paper-header-panel seamed>
+                <paper-toolbar>
+                    <span slot="top" class="title">[[titleHeader]]</span>
+                </paper-toolbar>
+            </paper-header-panel>
+        </div>
+        <div class="main-container" on-form-evaluator-submitted="_handleFormSubmit">
+            <form-evaluator-generator fields="[[form]]">
+            </form-evaluator-generator>
+        </div>
+        <div class="footer-container">
+            <slot name="footer">[[titleFooter]]</slot>
+        </div>
+
+        <credit-connection id="creditConnection" method="POST"  params="[[params]]" body="[[body]]" config="[[config]]" on-credit-approved="_handleAproved" on-credit-denegate="_handleDenegade" on-error-request="_handleError"></credit-connection>
+    </template>
+
+    <script>
+        /**
+         * `Credit-evaluator`
+         * Polymer component that creates a generic, customizable and dynamic credit evaluator.
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        (function (customElements) {
+            'use strict';
+
+            class CreditEvaluator extends Polymer.Element {
+                static get is() {
+                    return 'credit-evaluator';
+                }
+
+                static get properties() {
+                    return {
+                        titleHeader: {
+                            type: String,
+                            value: 'Evaluator'
+                        },
+                        titleFooter: {
+                            type: String,
+                            value: '@Copyright 2017'
+                        },
+                        url: {
+                            type: String,
+                            value: 'https://teloprestopapu.herokuapp.com/api/calculate'
+                        },
+                        body: {
+                            type: Object,
+                            value: {}
+                        },
+                        config: {
+                            type: Object,
+                            value: {}
+                        },
+                        params: {
+                            type: Object,
+                            value: {}
+                        },
+                        form: {
+                            type: Array,
+                            value: [
+                                {
+                                    label: 'Nombre',
+                                    error: 'Este campo solo acepta letras',
+                                    pattern: '[a-zA-Z]*',
+                                    type: 'text',
+                                    name: 'name'
+                                },
+                                {
+                                    label: 'Appellido',
+                                    error: 'Este campo solo acepta letras',
+                                    pattern: '[a-zA-Z]*',
+                                    type: 'text',
+                                    name: 'lastName'
+                                },
+                                {
+                                    label: 'Amount',
+                                    error: 'Este campo solo acepta numeros',
+                                    pattern: '[0-9]*',
+                                    type: 'number',
+                                    name: 'creditAmount'
+                                },
+                                {
+                                    label: 'Monthly',
+                                    error: 'Este campo solo acepta numeros',
+                                    pattern: '[0-9]*',
+                                    type: 'text',
+                                    name: 'monthlyIncome'
+                                },
+                                {
+                                    label: 'Tiempo',
+                                    error: 'Este campo solo acepta numeros',
+                                    pattern: '[0-9]*',
+                                    type: 'number',
+                                    name: 'timeToPay'
+                                }
+                            ]
+                        }
+                    };
+                }
+
+                _generateReques() {
+                    this.$.creditConnection.generateRequest();
+                }
+
+                _generateBody(values) {
+                    console.log(values);
+                    let bodyObject = {};
+                    values.forEach(function normalizeObject(item) {
+                        Object.defineProperty(bodyObject, item.name, {
+                            value: item.value,
+                            writable: true,
+                            enumerable: true,
+                            configurable: true
+                        });
+                    });
+                    this.set('body', bodyObject);
+                    console.log(bodyObject);
+                }
+
+                _handleFormSubmit(event) {
+                    this._generateBody(event.detail);
+                    this._generateReques();
+                }
+
+                _handleAproved() {
+                    console.log("aproved");
+                }
+
+                _handleDenegade() {
+                    console.log("denegade");
+                }
+
+                _handleError() {
+                    console.log("error");
+                }
+
+            }
+
+            customElements.define(CreditEvaluator.is, CreditEvaluator);
+        })(window.customElements);
+    </script>
+</dom-module>
